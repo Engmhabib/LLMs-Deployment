@@ -1,0 +1,39 @@
+services:
+  fastapi:
+    build:
+      context: ./fastapi_app
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.dev  # Adjust to .env.prod for production
+    volumes:
+      - ./config.py:/app/config.py  # Mount config.py from root directory
+
+  celery:
+    build:
+      context: ./celery_worker
+      dockerfile: Dockerfile
+    env_file:
+      - .env.dev  # Adjust to .env.prod for production
+    volumes:
+      - ./config.py:/app/config.py  # Mount config.py from root directory
+
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+
+
+  mlflow:
+    build:
+      context: ./mlflow_setup
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env.dev  # Adjust to .env.prod for production
+    volumes:
+      - ./mlflow.db:/mlflow.db
+      - ./mlruns:/mlruns
+      - ./config.py:/app/config.py
